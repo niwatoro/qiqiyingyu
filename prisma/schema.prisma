@@ -4,6 +4,7 @@
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
+  binaryTargets   = ["native", "darwin-arm64"]
 }
 
 datasource db {
@@ -13,7 +14,10 @@ datasource db {
 }
 
 model Word {
-  id   Int      @id @default(autoincrement())
-  word String   @unique
-  date DateTime
+  id      Int      @id @default(autoincrement())
+  word    String   @unique
+  date    DateTime
+  stage   Int      @default(0)
+  correct Int      @default(0)
+  total   Int      @default(0)
 }
