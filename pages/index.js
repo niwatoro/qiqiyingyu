@@ -23,11 +23,19 @@ export default class Home extends Component {
                 <Center>
                     <NextLink href="/study" passHref>
                         <IconButton
+                        margin={1}
+                        width="100px"
+                        height="100px"
+                        fontSize="6xl"
                             icon={<GiBrain />} />
                     </NextLink>
                     <NextLink href="/review" passHref>
                         <IconButton
-                            icon={<GiSpellBook />} />
+                        margin={1}
+                        width="100px"
+                        height="100px"
+                        fontSize="6xl"
+                        icon={<GiSpellBook />} />
                     </NextLink>
                 </Center>
             </Box>
