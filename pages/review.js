@@ -89,7 +89,7 @@ export default class Review extends Component {
         return (
             <Box>
                 <NextLink href="/" passHref>
-                    <IconButton icon={<ArrowBackIcon />}/>
+                    <IconButton icon={<ArrowBackIcon />} />
                 </NextLink>
                 <TableContainer>
                     <Table>
@@ -111,14 +111,17 @@ export default class Review extends Component {
                             </Tr>
                         </Thead>
                         <Tbody>
-                            {words.map((elem, idx) =>
+                            {words.map((elem, idx) => {
+                                console.log(elem.date)
+                                return (
                                 <Tr key={idx}>
                                     <Td><EditWordButton word={elem.word} /></Td>
                                     <Td>{elem.word}</Td>
-                                    <Td>{String(new Date(elem.date))}</Td>
+                                    <Td>{elem.date.toString().split("T")[0]}</Td>
                                     <Td>{elem.stage}</Td>
                                     <Td><DeleteAlertDialog word={elem.word} /></Td>
-                                </Tr>)}
+                                </Tr>
+                                )})}
                         </Tbody>
                     </Table>
                 </TableContainer>
@@ -174,7 +177,7 @@ function AddWordButton({ reloadPage }) {
         </Box>)
 }
 
-function EditWordButton({ word}) {
+function EditWordButton({ word }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const initialRef = React.useRef(null)
     const finalRef = React.useRef(null)
@@ -221,7 +224,7 @@ function EditWordButton({ word}) {
         </Box>)
 }
 
-function DeleteAlertDialog({ word}) {
+function DeleteAlertDialog({ word }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const cancelRef = React.useRef()
     async function DeleteWord() {
