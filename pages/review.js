@@ -91,7 +91,7 @@ export default class Review extends Component {
                 <NextLink href="/" passHref>
                     <IconButton icon={<ArrowBackIcon />} />
                 </NextLink>
-                <TableContainer>
+                <TableContainer width={"100vw"}>
                     <Table>
                         <TableCaption placement="top">
                             <Center>
