@@ -34,6 +34,7 @@ import {
     AlertDialogContent,
     AlertDialogOverlay,
     Heading,
+    Icon,
 } from "@chakra-ui/react"
 import {
     AddIcon,
@@ -41,15 +42,20 @@ import {
     EditIcon,
     ArrowBackIcon
 } from "@chakra-ui/icons"
+import {
+    AiFillFile,
+    AiOutlineFire,
+} from "react-icons/ai"
 import NextLink from "next/link"
+import { Speaker } from "../components/components";
 
 
 export default class Review extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            isLoading: true,
             words: [],
+            isLoading: true
         }
     }
 
@@ -67,10 +73,8 @@ export default class Review extends Component {
         })
         const data = await response.json()
         this.setState({
-            words: data
-        })
-        this.setState({
-            isLoading: false
+            words: data,
+            isLoading: false,
         })
     }
 
@@ -85,14 +89,20 @@ export default class Review extends Component {
         }
 
         const words = this.state.words
+        if (words.length === 0) {
+            return (
+                <Box>No data</Box>
+            )
+        }
+        console.log(words)
 
         return (
             <Box>
                 <NextLink href="/" passHref>
                     <IconButton icon={<ArrowBackIcon />} />
                 </NextLink>
-                <TableContainer width={"100vw"}>
-                    <Table>
+                <TableContainer>
+                    <Table width={"100vw"}>
                         <TableCaption placement="top">
                             <Center>
                                 <Flex>
@@ -105,23 +115,30 @@ export default class Review extends Component {
                             <Tr>
                                 <Th></Th>
                                 <Th>词汇</Th>
-                                <Th>创建日期</Th>
                                 <Th>熟记度</Th>
                                 <Th></Th>
                             </Tr>
                         </Thead>
                         <Tbody>
                             {words.map((elem, idx) => {
-                                console.log(elem.date)
                                 return (
-                                <Tr key={idx}>
-                                    <Td><EditWordButton word={elem.word} /></Td>
-                                    <Td>{elem.word}</Td>
-                                    <Td>{elem.date.toString().split("T")[0]}</Td>
-                                    <Td>{elem.stage}</Td>
-                                    <Td><DeleteAlertDialog word={elem.word} /></Td>
-                                </Tr>
-                                )})}
+                                    <Tr key={elem.id}>
+                                        <Td><EditWordButton word={elem.word} /></Td>
+                                        <Td>{elem.word}<Speaker word={elem.word}/></Td>
+                                        <Td>{
+                                            <Flex>{
+                                                Array(5).fill(0).map((elem, idx) => {
+                                                if (idx <= elem.stage){
+                                                    return <AiFillFire key={idx} />
+                                                } else {
+                                                    return <AiOutlineFire key={idx} />
+                                                }})
+                                            }</Flex>
+                                        }</Td>
+                                        <Td><DeleteAlertDialog word={elem.word} /></Td>
+                                    </Tr>
+                                )
+                            })}
                         </Tbody>
                     </Table>
                 </TableContainer>

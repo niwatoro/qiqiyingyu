@@ -17,9 +17,8 @@ import {
     ArrowForwardIcon,
     SpinnerIcon,
 } from "@chakra-ui/icons"
-import { HiSpeakerphone } from "react-icons/hi"
 import NextLink from "next/link"
-import { useSpeechSynthesis } from "react-speech-kit"
+import {Speaker} from "../components/components"
 
 export default class Study extends Component {
     constructor(props) {
@@ -87,7 +86,7 @@ export default class Study extends Component {
                     <IconButton icon={<ArrowBackIcon />} />
                 </NextLink>
                 <VStack>
-                    <Text>No. {idx+1}</Text>
+                    <Text>No. {idx + 1}</Text>
                     <Speaker word={word} />
                     <Input value={answer} width={300} onChange={(e) => this.setState({ answer: e.target.value })} />
                     {answered
@@ -137,16 +136,4 @@ export default class Study extends Component {
             </Box>
         )
     }
-}
-
-function Speaker({ word }) {
-    const { speak } = useSpeechSynthesis()
-
-    function speakWord() {
-        speak({ text: word })
-    }
-
-    return (
-        <IconButton icon={<HiSpeakerphone />} onClick={speakWord} />
-    )
 }
