@@ -169,7 +169,7 @@ export default class Review extends Component {
                                                             {elem1.genre}
                                                         </MenuItem>
                                                     </React.Fragment>)}
-                                                    <AddGenreMenuItem word={elem.word} genre={elem.genre} reload={() => this.setState({ isLoading: true })} />
+                                                    <AddGenreMenuItem word={elem.word} genre={elem.genre} key={genres.length} reload={() => this.setState({ isLoading: true })} />
                                                 </MenuList>
                                             </Menu>
                                         </Td>
