@@ -35,15 +35,24 @@ import {
     AlertDialogOverlay,
     Heading,
     Icon,
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
 } from "@chakra-ui/react"
 import {
     AddIcon,
     DeleteIcon,
     EditIcon,
-    ArrowBackIcon
+    ArrowBackIcon,
+    ChevronDownIcon
 } from "@chakra-ui/icons"
 import {
-    AiFillFile,
+    AiFillFire,
     AiOutlineFire,
 } from "react-icons/ai"
 import NextLink from "next/link"
@@ -55,11 +64,12 @@ export default class Review extends Component {
         super(props)
         this.state = {
             words: [],
-            isLoading: true
+            isLoading: true,
+            genres: [],
         }
     }
 
-    componentDidMount() {
+    componentDidMount = () => {
         this.InitializePage()
     }
 
@@ -72,6 +82,19 @@ export default class Review extends Component {
             })
         })
         const data = await response.json()
+
+        const response_ = await fetch("/api/word", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                "action": "getgenres"
+            })
+        })
+        const data_ = await response_.json()
+        this.setState({
+            genres: data_
+        })
+
         this.setState({
             words: data,
             isLoading: false,
@@ -79,8 +102,7 @@ export default class Review extends Component {
     }
 
     render() {
-        const isLoading = this.state.isLoading
-        if (isLoading) {
+        if (this.state.isLoading) {
             return (
                 <Center>
                     <Spinner />
@@ -94,7 +116,8 @@ export default class Review extends Component {
                 <Box>No data</Box>
             )
         }
-        console.log(words)
+        const genres = this.state.genres
+        console.log(genres)
 
         return (
             <Box>
@@ -107,7 +130,7 @@ export default class Review extends Component {
                             <Center>
                                 <Flex>
                                     <Heading marginRight={2}>词汇表</Heading>
-                                    <AddWordButton reloadPage={this.InitializePage} />
+                                    <AddWordButton />
                                 </Flex>
                             </Center>
                         </TableCaption>
@@ -115,6 +138,7 @@ export default class Review extends Component {
                             <Tr>
                                 <Th></Th>
                                 <Th>词汇</Th>
+                                <Th>分类</Th>
                                 <Th>熟记度</Th>
                                 <Th></Th>
                             </Tr>
@@ -124,15 +148,40 @@ export default class Review extends Component {
                                 return (
                                     <Tr key={elem.id}>
                                         <Td><EditWordButton word={elem.word} /></Td>
-                                        <Td>{elem.word}<Speaker word={elem.word}/></Td>
+                                        <Td>{elem.word}<Speaker word={elem.word} /></Td>
+                                        <Td>
+                                            <Menu>
+                                                <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>{elem.genre}</MenuButton>
+                                                <MenuList>
+                                                    {genres.map((elem1, idx1) => <React.Fragment>
+                                                        <MenuItem key={idx1} onClick={async () => {
+                                                            await fetch("/api/word", {
+                                                                method: "POST",
+                                                                headers: { "content-type": "application/json" },
+                                                                body: JSON.stringify({
+                                                                    "action": "updategenre",
+                                                                    "word": elem.word,
+                                                                    "updated": elem1.genre,
+                                                                })
+                                                            })
+                                                            window.location.reload()
+                                                        }}>
+                                                            {elem1.genre}
+                                                        </MenuItem>
+                                                    </React.Fragment>)}
+                                                    <AddGenreMenuItem word={elem.word} genre={elem.genre} reload={() => this.setState({ isLoading: true })} />
+                                                </MenuList>
+                                            </Menu>
+                                        </Td>
                                         <Td>{
                                             <Flex>{
-                                                Array(5).fill(0).map((elem, idx) => {
-                                                if (idx <= elem.stage){
-                                                    return <AiFillFire key={idx} />
-                                                } else {
-                                                    return <AiOutlineFire key={idx} />
-                                                }})
+                                                Array(5).fill(0).map((elem2, idx2) => {
+                                                    if (idx <= elem.stage) {
+                                                        return <AiFillFire key={idx2} />
+                                                    } else {
+                                                        return <AiOutlineFire key={idx2} />
+                                                    }
+                                                })
                                             }</Flex>
                                         }</Td>
                                         <Td><DeleteAlertDialog word={elem.word} /></Td>
@@ -147,21 +196,22 @@ export default class Review extends Component {
     }
 }
 
-function AddWordButton({ reloadPage }) {
+function AddWordButton() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const initialRef = React.useRef(null)
     const finalRef = React.useRef(null)
     async function AddWord() {
+        onClose()
         await fetch("/api/word", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({
                 "action": "create",
-                "word": initialRef.current.value
+                "word": initialRef.current.value,
+                "genre": finalRef.current.value
             })
         })
-        onClose()
-        reloadPage()
+        window.location.reload()
     }
 
     return (
@@ -183,6 +233,8 @@ function AddWordButton({ reloadPage }) {
                         <FormControl>
                             <FormLabel>输入单词</FormLabel>
                             <Input ref={initialRef} placeholder="输入单词" />
+                            <FormLabel marginTop={3}>输入分类</FormLabel>
+                            <Input ref={finalRef} placeholder="输入分类" />
                         </FormControl>
                     </ModalBody>
                     <ModalFooter>
@@ -209,6 +261,7 @@ function EditWordButton({ word }) {
                 "updated": initialRef.current.value,
             })
         })
+        window.location.reload()
     }
 
     return (
@@ -254,6 +307,7 @@ function DeleteAlertDialog({ word }) {
                 "word": word
             })
         })
+        window.location.reload()
     }
 
     return (
@@ -277,4 +331,52 @@ function DeleteAlertDialog({ word }) {
             </AlertDialog>
         </Box>
     )
+}
+
+
+function AddGenreMenuItem({ word, genre, reload }) {
+    const { isOpen, onOpen, onClose } = useDisclosure()
+    const initialRef = React.useRef(null)
+    const finalRef = React.useRef(null)
+    async function AddGenre() {
+        onClose()
+        await fetch("/api/word", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify({
+                "action": "updategenre",
+                "word": word,
+                "updated": initialRef.current.value,
+            })
+        })
+        window.location.reload()
+    }
+
+    return (
+        <MenuItem onClick={onOpen}>
+            <Text
+                as="b"
+                ref={finalRef}>添加分类</Text>
+            <Modal
+                initialFocusRef={initialRef}
+                finalFocusRef={finalRef}
+                isOpen={isOpen}
+                onClose={onClose}>
+                <ModalOverlay />
+                <ModalContent>
+                    <ModalHeader>添加分类</ModalHeader>
+                    <ModalCloseButton />
+                    <ModalBody>
+                        <FormControl>
+                            <FormLabel>输入分类</FormLabel>
+                            <Input ref={initialRef} placeholder="输入分类" defaultValue={genre} />
+                        </FormControl>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button marginRight={1} onClick={AddGenre}>保存</Button>
+                        <Button onClick={onClose}>关闭</Button>
+                    </ModalFooter>
+                </ModalContent>
+            </Modal>
+        </MenuItem>)
 }

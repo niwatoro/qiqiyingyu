@@ -17,6 +17,7 @@ model Word {
   id      Int      @id @default(autoincrement())
   word    String   @unique
   date    DateTime
+  genre   String   @default("main")
   stage   Int      @default(0)
   correct Int      @default(0)
   total   Int      @default(0)
