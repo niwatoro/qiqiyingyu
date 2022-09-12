@@ -153,23 +153,28 @@ export default class Review extends Component {
                                             <Menu>
                                                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>{elem.genre}</MenuButton>
                                                 <MenuList>
-                                                    {genres.map((elem1, idx1) => <React.Fragment>
-                                                        <MenuItem key={idx1} onClick={async () => {
-                                                            await fetch("/api/word", {
-                                                                method: "POST",
-                                                                headers: { "content-type": "application/json" },
-                                                                body: JSON.stringify({
-                                                                    "action": "updategenre",
-                                                                    "word": elem.word,
-                                                                    "updated": elem1.genre,
+                                                    {genres.map((elem1, idx1) =>
+                                                        <MenuItem
+                                                            key={idx1}
+                                                            onClick={async () => {
+                                                                await fetch("/api/word", {
+                                                                    method: "POST",
+                                                                    headers: { "content-type": "application/json" },
+                                                                    body: JSON.stringify({
+                                                                        "action": "updategenre",
+                                                                        "word": elem.word,
+                                                                        "updated": elem1.genre,
+                                                                    })
                                                                 })
-                                                            })
-                                                            window.location.reload()
-                                                        }}>
+                                                                window.location.reload()
+                                                            }}>
                                                             {elem1.genre}
-                                                        </MenuItem>
-                                                    </React.Fragment>)}
-                                                    <AddGenreMenuItem word={elem.word} genre={elem.genre} key={genres.length} reload={() => this.setState({ isLoading: true })} />
+                                                        </MenuItem>)}
+                                                    <AddGenreMenuItem
+                                                        idx={genres.length}
+                                                        word={elem.word}
+                                                        genre={elem.genre}
+                                                        reload={() => this.setState({ isLoading: true })} />
                                                 </MenuList>
                                             </Menu>
                                         </Td>
@@ -334,7 +339,7 @@ function DeleteAlertDialog({ word }) {
 }
 
 
-function AddGenreMenuItem({ word, genre, reload }) {
+function AddGenreMenuItem({ word, genre, idx }) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const initialRef = React.useRef(null)
     const finalRef = React.useRef(null)
@@ -353,7 +358,7 @@ function AddGenreMenuItem({ word, genre, reload }) {
     }
 
     return (
-        <MenuItem onClick={onOpen}>
+        <MenuItem onClick={onOpen} key={idx}>
             <Text
                 as="b"
                 ref={finalRef}>添加分类</Text>
