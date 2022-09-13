@@ -6,7 +6,7 @@ export function Speaker({ word }) {
     const { speak } = useSpeechSynthesis()
 
     function speakWord() {
-        speak({ text: word })
+        speak({ text: word,lang:"en-US" })
     }
 
     return (
